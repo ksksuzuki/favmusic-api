@@ -28,7 +28,7 @@ module.exports = {
       .from(MUSIC_TABLE)
   },
 
-  getById(id) {
+  getFilterdMusic(filter) {
     return knex
       .select({
         id: 'id',
@@ -38,10 +38,7 @@ module.exports = {
         description: 'description',
       })
       .from(MUSIC_TABLE)
-      .where({
-        id: id,
-      })
-      .first()
+      .where(filter)
   },
 
   create(music) {

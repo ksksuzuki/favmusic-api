@@ -1,14 +1,26 @@
 const express = require('express')
 const musicModel = require('./music/music.model')
 const userModel = require('./user/user.model')
+const favoriteModel = require('./favorite/favorite.model')
 
 const setupServer = () => {
   const app = express()
   app.use(express.json())
 
   app.get('/music', async (req, res) => {
-    const music = await musicModel.getAll()
-    res.json(music)
+    const { query } = req
+    const filter = {}
+
+    Object.keys(query).forEach((key) => {
+      key === 'genreId'
+        ? (filter.genre_id = query[key])
+        : (filter[key] = query[key])
+    })
+    const result =
+      Object.keys(filter).length === 0
+        ? await musicModel.getAll()
+        : await musicModel.getFilterdMusic(filter)
+    res.json(result)
   })
 
   app.post('/music', async (req, res) => {
@@ -40,7 +52,8 @@ const setupServer = () => {
       } else {
         throw new Error()
       }
-    } catch {
+    } catch (e) {
+      console.log(e)
       res.status(500).end()
     }
   })
@@ -49,12 +62,16 @@ const setupServer = () => {
     const id = parseInt(req.params.id)
     try {
       if (!isNaN(id)) {
+        const favoriteList = await favoriteModel.getByMusicId(id)
+        if (favoriteList.length >= 1)
+          throw new Error('target music is favorited by anyone')
         await musicModel.remove(id)
         res.status(200).end()
       } else {
         throw new Error()
       }
-    } catch {
+    } catch (e) {
+      console.log(e)
       res.status(500).end()
     }
   })
@@ -64,11 +81,14 @@ const setupServer = () => {
     try {
       if (!isNaN(id)) {
         const user = await userModel.getById(id)
+        const favorites = await favoriteModel.getByUserId(id)
+        user.favorites = favorites
         res.json(user)
       } else {
         throw new Error()
       }
-    } catch {
+    } catch (e) {
+      console.log(e)
       res.status(500).end()
     }
   })
@@ -102,29 +122,33 @@ const setupServer = () => {
       } else {
         throw new Error()
       }
-    } catch {
+    } catch (e) {
+      console.log(e)
       res.status(500).end()
     }
   })
 
-  // app.get('/api/pokemon/:idOrName/evolutions', (req, res) => {
-  //   const idOrName = parseInt(req.params.idOrName)
-  //   let result = []
-  //   if (isNaN(idOrName)) {
-  //     result = pokeData.pokemon.filter(
-  //       (item) => item.name.toUpperCase() === req.params.idOrName.toUpperCase()
-  //     )[0].evolutions
-  //   } else {
-  //     result = pokeData.pokemon.filter(
-  //       (item) => parseInt(item.id) === idOrName
-  //     )[0].evolutions
-  //   }
-  //   if (result === undefined) {
-  //     res.send([])
-  //   } else {
-  //     res.send(result)
-  //   }
-  // })
+  app.post('/user/:id/favorite', async (req, res) => {
+    const userId = parseInt(req.params.id)
+    const { musicId } = req.body
+
+    const payload = {
+      music_id: musicId,
+      user_id: userId,
+    }
+
+    try {
+      if (!isNaN(userId)) {
+        await favoriteModel.register(payload)
+        res.status(201).end()
+      } else {
+        throw new Error()
+      }
+    } catch (e) {
+      console.log(e)
+      res.status(500).end()
+    }
+  })
 
   return app
 }
