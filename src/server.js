@@ -167,24 +167,20 @@ const setupServer = () => {
     }
   })
 
-  app.post('/login/:id', async (req, res) => {
+  app.post('/login', async (req, res) => {
     const { email, password } = req.body
 
-    const id = parseInt(req.params.id)
     try {
-      if (!isNaN(id)) {
-        const user = await userModel.getCredential(id)
-        if (user.email === email && user.password === password) {
-          const login = await loginModel.get(id)
-          if (login.length === 0) {
-            await loginModel.register(id)
-          }
-          res.end()
-        } else {
-          throw new Error('invalid credential')
+      const user = await userModel.getCredential(email)
+
+      if (user.email === email && user.password === password) {
+        const login = await loginModel.get(user.id)
+        if (login.length === 0) {
+          await loginModel.register(user.id)
         }
+        res.json({ id: user.id })
       } else {
-        throw new Error()
+        throw new Error('invalid credential')
       }
     } catch (e) {
       console.log(e)

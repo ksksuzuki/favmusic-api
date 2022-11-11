@@ -37,7 +37,7 @@ module.exports = {
       .first()
   },
 
-  getCredential(id) {
+  getCredential(email) {
     return knex
       .select({
         id: 'id',
@@ -46,7 +46,7 @@ module.exports = {
       })
       .from(USER_TABLE)
       .where({
-        id,
+        email,
       })
       .first()
   },

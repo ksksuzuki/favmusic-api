@@ -179,17 +179,17 @@ describe('favmusic API Server', () => {
   describe('GET /login/:id', () => {
     it('should return login', async () => {
       await request
-        .post('/login/1')
+        .post('/login')
         .send({ email: 'keisuke@test.com', password: 'password' })
       const res = await request.get('/login/1')
       expect(res.status).to.equal(200)
       JSON.parse(res.text).should.deep.equal({ login: true })
     })
   })
-  describe('POST /login/:id', () => {
+  describe('POST /login', () => {
     it('should regiter login', async () => {
       await request
-        .post('/login/1')
+        .post('/login')
         .send({ email: 'keisuke@test.com', password: 'password' })
       const res = await request.get('/login/1')
       expect(res.status).to.equal(200)
