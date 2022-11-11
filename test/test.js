@@ -175,4 +175,47 @@ describe('favmusic API Server', () => {
       expect(res.status).to.equal(201)
     })
   })
+
+  describe('GET /login/:id', () => {
+    it('should return login', async () => {
+      await request
+        .post('/login/1')
+        .send({ email: 'keisuke@test.com', password: 'password' })
+      const res = await request.get('/login/1')
+      expect(res.status).to.equal(200)
+      JSON.parse(res.text).should.deep.equal({ login: true })
+    })
+  })
+  describe('POST /login/:id', () => {
+    it('should regiter login', async () => {
+      await request
+        .post('/login/1')
+        .send({ email: 'keisuke@test.com', password: 'password' })
+      const res = await request.get('/login/1')
+      expect(res.status).to.equal(200)
+      JSON.parse(res.text).should.deep.equal({ login: true })
+    })
+  })
+
+  describe('DELETE /login/:id', () => {
+    it('should delete login', async () => {
+      await request
+        .post('/login/1')
+        .send({ email: 'keisuke@test.com', password: 'password' })
+      await request.delete('/login/1')
+      const res = await request.get('/login/1')
+      JSON.parse(res.text).should.deep.equal({ login: false })
+    })
+  })
+
+  describe('GET /genre', () => {
+    it('should return all genre', async () => {
+      const res = await request.get('/genre')
+      JSON.parse(res.text).should.deep.equal([
+        { id: 1, name: 'ロック' },
+        { id: 2, name: 'Jポップ' },
+        { id: 3, name: 'ジャズ' },
+      ])
+    })
+  })
 })

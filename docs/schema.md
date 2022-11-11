@@ -50,3 +50,11 @@ Table favorite {
   }
 }
 ```
+
+## Login Table
+
+```
+Table login {
+  user_id int [ ref: > user.id, not null]
+}
+```

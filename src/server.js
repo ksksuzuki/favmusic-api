@@ -2,6 +2,8 @@ const express = require('express')
 const musicModel = require('./music/music.model')
 const userModel = require('./user/user.model')
 const favoriteModel = require('./favorite/favorite.model')
+const loginModel = require('./login/login.model')
+const genreModel = require('./genre/genre.model')
 
 const setupServer = () => {
   const app = express()
@@ -144,6 +146,71 @@ const setupServer = () => {
       } else {
         throw new Error()
       }
+    } catch (e) {
+      console.log(e)
+      res.status(500).end()
+    }
+  })
+
+  app.get('/login/:id', async (req, res) => {
+    const id = parseInt(req.params.id)
+    try {
+      if (!isNaN(id)) {
+        const login = await loginModel.get(id)
+        res.json({ login: login.length !== 0 })
+      } else {
+        throw new Error()
+      }
+    } catch (e) {
+      console.log(e)
+      res.status(500).end()
+    }
+  })
+
+  app.post('/login/:id', async (req, res) => {
+    const { email, password } = req.body
+
+    const id = parseInt(req.params.id)
+    try {
+      if (!isNaN(id)) {
+        const user = await userModel.getCredential(id)
+        if (user.email === email && user.password === password) {
+          const login = await loginModel.get(id)
+          if (login.length === 0) {
+            await loginModel.register(id)
+          }
+          res.end()
+        } else {
+          throw new Error('invalid credential')
+        }
+      } else {
+        throw new Error()
+      }
+    } catch (e) {
+      console.log(e)
+      res.status(500).end()
+    }
+  })
+
+  app.delete('/login/:id', async (req, res) => {
+    const id = parseInt(req.params.id)
+    try {
+      if (!isNaN(id)) {
+        await loginModel.remove(id)
+        res.status(200).end()
+      } else {
+        throw new Error()
+      }
+    } catch (e) {
+      console.log(e)
+      res.status(500).end()
+    }
+  })
+
+  app.get('/genre', async (req, res) => {
+    try {
+      const genre = await genreModel.get()
+      res.json(genre)
     } catch (e) {
       console.log(e)
       res.status(500).end()

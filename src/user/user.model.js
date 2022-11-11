@@ -37,6 +37,20 @@ module.exports = {
       .first()
   },
 
+  getCredential(id) {
+    return knex
+      .select({
+        id: 'id',
+        email: 'email',
+        password: 'password',
+      })
+      .from(USER_TABLE)
+      .where({
+        id,
+      })
+      .first()
+  },
+
   create(user) {
     validateRequired(validateProps(user))
     return knex(USER_TABLE).returning('id').insert(user)

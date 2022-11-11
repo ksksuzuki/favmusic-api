@@ -4,7 +4,7 @@
 
 ## エンドポイント
 
-### 必須
+### 実装済み
 
 - `GET /music`
   - 登録されているすべての楽曲を参照する
@@ -25,12 +25,16 @@
   - ユーザ情報を更新する
 - `POST /user/:id/favorite`
   - 楽曲をお気に入りに登録する
+- `GET /login/:id`
+  - ログイン状態の取得
+- `POST /login/:id`
+  - Email とパスワード正しい場合、ログイン状態への変更
+- `DELETE /login/:id`
+  - ログイン状態の削除
 
-### Nice to have
+### 未実装
 
-- `POST /api/types`
+- `POST /`
   - 楽曲のジャンルを追加する
-- `DELETE /api/types/:name`
+- `GET /`
   - 登録可能な楽曲ジャンルを取得する
-- `POST /api/types`
-  - ログイン状態の保持
