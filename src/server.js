@@ -7,6 +7,7 @@ const genreModel = require('./genre/genre.model')
 
 const setupServer = () => {
   const app = express()
+  app.use(express.urlencoded({ extended: true }))
   app.use(express.json())
 
   app.get('/music', async (req, res) => {
@@ -18,11 +19,17 @@ const setupServer = () => {
         ? (filter.genre_id = query[key])
         : (filter[key] = query[key])
     })
-    const result =
-      Object.keys(filter).length === 0
-        ? await musicModel.getAll()
-        : await musicModel.getFilterdMusic(filter)
-    res.json(result)
+    try {
+      const result =
+        Object.keys(filter).length === 0
+          ? await musicModel.getAll()
+          : await musicModel.getFilterdMusic(filter)
+
+      res.json(result)
+    } catch (e) {
+      console.log(e)
+      res.status(500).end()
+    }
   })
 
   app.post('/music', async (req, res) => {
@@ -46,10 +53,17 @@ const setupServer = () => {
 
   app.patch('/music/:id', async (req, res) => {
     const id = parseInt(req.params.id)
-    const { body } = req
+    const { name, artist, genreId, description } = req.body
+
+    const payload = {
+      name,
+      artist,
+      genre_id: genreId,
+      description,
+    }
     try {
       if (!isNaN(id)) {
-        await musicModel.update(id, body)
+        await musicModel.update(id, payload)
         res.status(200).end()
       } else {
         throw new Error()
@@ -62,6 +76,7 @@ const setupServer = () => {
 
   app.delete('/music/:id', async (req, res) => {
     const id = parseInt(req.params.id)
+    console.log(req.params)
     try {
       if (!isNaN(id)) {
         const favoriteList = await favoriteModel.getByMusicId(id)
@@ -70,6 +85,7 @@ const setupServer = () => {
         await musicModel.remove(id)
         res.status(200).end()
       } else {
+        console.log('ohh')
         throw new Error()
       }
     } catch (e) {
