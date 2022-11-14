@@ -218,4 +218,17 @@ describe('favmusic API Server', () => {
       ])
     })
   })
+
+  describe('POST /genre', () => {
+    it('should register funk genre', async () => {
+      await request.post('/genre').send({ id: 4, name: 'ファンク' })
+      const res = await request.get('/genre')
+      JSON.parse(res.text).should.deep.equal([
+        { id: 1, name: 'ロック' },
+        { id: 2, name: 'Jポップ' },
+        { id: 3, name: 'ジャズ' },
+        { id: 4, name: 'ファンク' },
+      ])
+    })
+  })
 })

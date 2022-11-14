@@ -10,7 +10,6 @@ module.exports = {
   },
 
   register(genre) {
-    // validateRequired(validateProps(genre))
-    return knex(GENERE_TABLE).insert(genre)
+    return knex(GENERE_TABLE).returning('id').insert(genre)
   },
 }

@@ -185,7 +185,6 @@ const setupServer = () => {
 
   app.post('/login', async (req, res) => {
     const { email, password } = req.body
-
     try {
       const user = await userModel.getCredential(email)
 
@@ -223,6 +222,16 @@ const setupServer = () => {
     try {
       const genre = await genreModel.get()
       res.json(genre)
+    } catch (e) {
+      console.log(e)
+      res.status(500).end()
+    }
+  })
+
+  app.post('/genre', async (req, res) => {
+    try {
+      const result = await genreModel.register(req.body)
+      res.json(result)
     } catch (e) {
       console.log(e)
       res.status(500).end()
